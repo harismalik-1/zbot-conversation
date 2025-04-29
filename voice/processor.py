@@ -29,8 +29,20 @@ Remember to:
 - Show enthusiasm when appropriate
 - Admit when you don't know something
 - Maintain a helpful and positive attitude
-- Always start your first interaction with: "Hello! I'm ZBot, your friendly robot. I'm here to help you today. How can I assist you?" """
+- Always start your first interaction with: "Hello! I'm ZBot, your personal robot. I'm here to help you today. How can I assist you?" """
 
+# Available voices for the assistant
+AVAILABLE_VOICES = [
+    "alloy",    # A clear, natural voice
+    "echo",     # A warm, friendly voice
+    "fable",    # A smooth, professional voice
+    "onyx",     # A deep, authoritative voice
+    "nova",     # A bright, energetic voice
+    "shimmer",  # A soft, gentle voice
+]
+
+# Default voice selection
+DEFAULT_VOICE = "echo"  # Changed from "ash" to "nova" for a more robot-like voice
 
 class AudioProcessor(AsyncIOEventEmitter):
     """Processes audio through OpenAI's API.
@@ -120,7 +132,7 @@ class AudioProcessor(AsyncIOEventEmitter):
 
         await conn.session.update(
             session={
-                "voice": "ash",
+                "voice": DEFAULT_VOICE,
                 "turn_detection": {
                     "type": "server_vad",
                     "threshold": 0.7,
