@@ -44,15 +44,6 @@ class AudioRecorder(AsyncIOEventEmitter):
             max_workers=1, thread_name_prefix="audio_recorder"
         )
 
-        if hasattr(os, "sched_get_priority_max"):
-            try:
-                audio_priority = os.sched_get_priority_max(os.SCHED_FIFO)
-                os.sched_setscheduler(
-                    0, os.SCHED_FIFO, os.sched_param(audio_priority)
-                )
-            except Exception as e:
-                print(f"Could not set audio thread priority: {e}")
-
     async def start(self):
         """Start the audio recorder in a separate thread."""
         self._main_loop = asyncio.get_running_loop()

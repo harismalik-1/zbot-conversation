@@ -10,8 +10,13 @@ import asyncio
 import threading
 import numpy as np
 import sounddevice as sd
+import platform
+import logging
 from pydub import AudioSegment
 from pyee.asyncio import AsyncIOEventEmitter
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 CHANNELS = 1
 SAMPLE_RATE = 24000
@@ -82,44 +87,32 @@ class AudioPlayer(AsyncIOEventEmitter):
     def _setup_audio_device(self):
         """Set up the audio output device."""
         devices = sd.query_devices()
-        print("Available audio devices:")
-        print(devices)
 
         try:
             if self.device_id is not None:
                 try:
                     device = sd.query_devices(self.device_id)
                     device_id = self.device_id
-                    print(f"Using specified output device: {device['name']}")
+                    logger.info(f"Output: {device['name']}")
                 except Exception as e:
-                    print(
-                        f"Warning: Could not use specified device ID {self.device_id}: {e}"
-                    )
+                    logger.warning(f"Could not use specified device ID {self.device_id}: {e}")
                     default_device = sd.query_devices(kind="output")
                     device_id = default_device["index"]
-                    print(
-                        f"Falling back to default output device: {default_device['name']}"
-                    )
+                    logger.info(f"Output: {default_device['name']}")
             else:
-
                 default_device = sd.query_devices(kind="output")
                 device_id = default_device["index"]
-                print(f"Using default output device: {default_device['name']}")
+                logger.info(f"Output: {default_device['name']}")
 
             device = sd.query_devices(device_id)
             supported_rates = device.get("default_samplerate")
-            print(f"Device default sample rate: {supported_rates}")
 
             self.input_rate = SAMPLE_RATE
-            self.output_rate = (
-                int(supported_rates) if supported_rates else SAMPLE_RATE
-            )
-            print(
-                f"Input rate: {self.input_rate}, Output rate: {self.output_rate}"
-            )
+            self.output_rate = int(supported_rates) if supported_rates else SAMPLE_RATE
+            logger.info(f"Sample rate: {self.output_rate} Hz")
 
         except Exception as e:
-            print(f"Warning: Error querying output device: {e}")
+            logger.error(f"Audio setup error: {e}")
             device_id = None
             self.input_rate = SAMPLE_RATE
             self.output_rate = SAMPLE_RATE
