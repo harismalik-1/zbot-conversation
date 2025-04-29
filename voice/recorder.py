@@ -66,9 +66,6 @@ class AudioRecorder(AsyncIOEventEmitter):
 
         devices = sd.query_devices()
         input_devices = [d for d in devices if d["max_input_channels"] > 0]
-        print("Available input devices:")
-        for d in input_devices:
-            print(f"  ID: {d['index']}, Name: {d['name']}")
 
         device = self.microphone_id
         try:
